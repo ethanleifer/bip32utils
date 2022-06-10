@@ -6,11 +6,11 @@
 
 import os
 import hmac
-from .ripemd160 import ripemd160
+from ripemd160 import ripemd160
 import ecdsa
 import struct
 import codecs
-from . import Base58
+import Base58
 
 from hashlib import sha256, sha512
 from binascii import b2a_hex
@@ -41,7 +41,7 @@ class BIP32Key(object):
         if not len(entropy) >= MIN_ENTROPY_LEN/8:
             raise ValueError("Initial entropy %i must be at least %i bits" %
                                 (len(entropy), MIN_ENTROPY_LEN))
-        I = hmac.new(b"Bitcoin seed", entropy, hashlib.sha512).digest()
+        I = hmac.new(b"Bitcoin seed", entropy, sha512).digest()
         Il, Ir = I[:32], I[32:]
         # FIXME test Il for 0 or less than SECP256k1 prime field order
         key = BIP32Key(secret=Il, chain=Ir, depth=0, index=0, fpr=b'\0\0\0\0', public=False, testnet=testnet)
@@ -361,10 +361,10 @@ if __name__ == "__main__":
     import sys
 
     # BIP0032 Test vector 1
-    entropy='000102030405060708090A0B0C0D0E0F'.decode('hex')
+    entropy=codecs.decode('000102030405060708090A0B0C0D0E0F', "hex")
     m = BIP32Key.fromEntropy(entropy)
     print("Test vector 1:")
-    print("Master (hex):", entropy.encode('hex'))
+    print("Master (hex):", codecs.encode(entropy, "hex"))
     print("* [Chain m]")
     m.dump()
 
@@ -389,10 +389,10 @@ if __name__ == "__main__":
     m.dump()
 
     # BIP0032 Test vector 2
-    entropy = 'fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542'.decode('hex')
+    entropy = codecs.decode('fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542',"hex")
     m = BIP32Key.fromEntropy(entropy)
     print("Test vector 2:")
-    print("Master (hex):", entropy.encode('hex'))
+    print("Master (hex):", codecs.encode(entropy,"hex"))
     print("* [Chain m]")
     m.dump()
 
